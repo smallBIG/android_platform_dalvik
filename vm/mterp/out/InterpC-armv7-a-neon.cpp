@@ -1374,8 +1374,11 @@ GOTO_TARGET_DECL(exceptionThrown);
 /* ifdef WITH_TAINT_TRACKING */                                             \
 	/*TLOGW("|IPUTQ not supported by taint tracking!!!");*/             \
 	/* compile flag WITH_TAINT_ODEX controls this now */                \
-	dvmSetFieldTaint##_ftype(obj, ref,                                  \
-		GET_REGISTER_TAINT##_regsize(vdst));                        \
+	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
+	dvmSetFieldTaint##_ftype(obj, ref, tag);                            \
+	if(tag != 0){                                                       \
+		TLOGW("SESAME set %s->%d with %d", obj->clazzdescriptor, ref, tag);     \
+	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
     FINISH(2);
@@ -1435,8 +1438,12 @@ GOTO_TARGET_DECL(exceptionThrown);
         ILOGV("+ SPUT '%s'=0x%08llx",                                       \
             sfield->field.name, (u8)GET_REGISTER##_regsize(vdst));          \
 /* ifdef WITH_TAINT_TRACKING */                                             \
-	dvmSetStaticFieldTaint##_ftype(sfield,                              \
-		GET_REGISTER_TAINT##_regsize(vdst));                        \
+	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
+	dvmSetStaticFieldTaint##_ftype(sfield, tag);                        \
+	if(tag != 0){                                                       \
+		TLOGW("SESAME SET %s->%s with %d", sfield->field.clazz->descriptor,     \
+				sfield->field.name, tag);                                           \
+	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
     FINISH(2);
