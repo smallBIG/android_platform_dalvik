@@ -1377,7 +1377,7 @@ GOTO_TARGET_DECL(exceptionThrown);
 	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
 	dvmSetFieldTaint##_ftype(obj, ref, tag);                            \
 	if(tag != 0){                                                       \
-		TLOGW("SESAME set %s->%d with %d", obj->clazzdescriptor, ref, tag);     \
+		TLOGW("SESAME set %s->%d with %d", obj->clazz->descriptor, ref, tag);     \
 	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
@@ -1441,8 +1441,8 @@ GOTO_TARGET_DECL(exceptionThrown);
 	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
 	dvmSetStaticFieldTaint##_ftype(sfield, tag);                        \
 	if(tag != 0){                                                       \
-		TLOGW("SESAME SET %s->%s with %d", sfield->field.clazz->descriptor,     \
-				sfield->field.name, tag);                                           \
+		TLOGW("SESAME SET %s->%s with %d", sfield->clazz->descriptor,     \
+				sfield->name, tag);                                           \
 	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
@@ -1656,11 +1656,10 @@ HANDLE_OPCODE(OP_RETURN /*vAA*/)
         (INST_INST(inst) == OP_RETURN) ? "" : "-object", vsrc1);
     retval.i = GET_REGISTER(vsrc1);
 /* ifdef WITH_TAINT_TRACKING */
-		int tag = GET_REGISTER_TAINT(vsrc1);
-    SET_RETURN_TAINT(tag);
-		if(tag != 0){
+    SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
+		if(GET_REGISTER_TAINT(vsrc1) != 0){
 			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
-					curMethod->name, tag);
+					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
     GOTO_returnFromMethod();
@@ -1672,11 +1671,10 @@ HANDLE_OPCODE(OP_RETURN_WIDE /*vAA*/)
     ILOGV("|return-wide v%d", vsrc1);
     retval.j = GET_REGISTER_WIDE(vsrc1);
 /* ifdef WITH_TAINT_TRACKING */
-		int tag = GET_REGISTER_TAINT_WIDE(vsrc1);
-    SET_RETURN_TAINT(tag);
-		if(tag != 0){
+    SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
+		if(GET_REGISTER_TAINT(vsrc1) != 0){
 			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
-					curMethod->name, tag);
+					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
     GOTO_returnFromMethod();
@@ -1690,11 +1688,10 @@ HANDLE_OPCODE(OP_RETURN_OBJECT /*vAA*/)
         (INST_INST(inst) == OP_RETURN) ? "" : "-object", vsrc1);
     retval.i = GET_REGISTER(vsrc1);
 /* ifdef WITH_TAINT_TRACKING */
-		int tag = GET_REGISTER_TAINT(vsrc1);
-    SET_RETURN_TAINT(tag);
-		if(tag != 0){
+    SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
+		if(GET_REGISTER_TAINT(vsrc1) != 0){
 			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
-					curMethod->name, tag);
+					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
     GOTO_returnFromMethod();

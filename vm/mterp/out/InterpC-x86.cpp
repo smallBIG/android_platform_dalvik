@@ -1377,7 +1377,7 @@ GOTO_TARGET_DECL(exceptionThrown);
 	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
 	dvmSetFieldTaint##_ftype(obj, ref, tag);                            \
 	if(tag != 0){                                                       \
-		TLOGW("SESAME set %s->%d with %d", obj->clazzdescriptor, ref, tag);     \
+		TLOGW("SESAME set %s->%d with %d", obj->clazz->descriptor, ref, tag);     \
 	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
@@ -1441,8 +1441,8 @@ GOTO_TARGET_DECL(exceptionThrown);
 	int tag = GET_REGISTER_TAINT##_regsize(vdst);                       \
 	dvmSetStaticFieldTaint##_ftype(sfield, tag);                        \
 	if(tag != 0){                                                       \
-		TLOGW("SESAME SET %s->%s with %d", sfield->field.clazz->descriptor,     \
-				sfield->field.name, tag);                                           \
+		TLOGW("SESAME SET %s->%s with %d", sfield->clazz->descriptor,     \
+				sfield->name, tag);                                           \
 	}                                                                         \
 /* endif */                                                                 \
     }                                                                       \
