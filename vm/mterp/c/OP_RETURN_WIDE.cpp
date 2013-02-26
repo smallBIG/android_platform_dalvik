@@ -5,7 +5,7 @@ HANDLE_OPCODE(OP_RETURN_WIDE /*vAA*/)
 /* ifdef WITH_TAINT_TRACKING */
     SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
 		if(GET_REGISTER_TAINT(vsrc1) != 0){
-			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
+			TLOGW("SESAME ret frm %s->%s with %x", curMethod->clazz->descriptor, 
 					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */

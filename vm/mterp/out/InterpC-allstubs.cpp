@@ -1658,7 +1658,7 @@ HANDLE_OPCODE(OP_RETURN /*vAA*/)
 /* ifdef WITH_TAINT_TRACKING */
     SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
 		if(GET_REGISTER_TAINT(vsrc1) != 0){
-			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
+			TLOGW("SESAME ret frm %s->%s with %x", curMethod->clazz->descriptor, 
 					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
@@ -1673,7 +1673,7 @@ HANDLE_OPCODE(OP_RETURN_WIDE /*vAA*/)
 /* ifdef WITH_TAINT_TRACKING */
     SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
 		if(GET_REGISTER_TAINT(vsrc1) != 0){
-			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
+			TLOGW("SESAME ret frm %s->%s with %x", curMethod->clazz->descriptor, 
 					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
@@ -1690,7 +1690,7 @@ HANDLE_OPCODE(OP_RETURN_OBJECT /*vAA*/)
 /* ifdef WITH_TAINT_TRACKING */
     SET_RETURN_TAINT(GET_REGISTER_TAINT(vsrc1));
 		if(GET_REGISTER_TAINT(vsrc1) != 0){
-			TLOGW("SESAME ret frm %s->%s with %d", curMethod->clazz->descriptor, 
+			TLOGW("SESAME ret frm %s->%s with %x", curMethod->clazz->descriptor, 
 					curMethod->name, GET_REGISTER_TAINT(vsrc1));
 		}
 /* endif */
@@ -4363,7 +4363,7 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 										methodToCall->name);
 								int pi = 0;
 								for(; pi < vsrc1; pi++){
-									TLOGW("SESAME %d", outs[vsrc1+1+pi]);
+									TLOGW("SESAME %x", outs[vsrc1+1+pi]);
 								}
 							}
             } else {
@@ -4382,7 +4382,7 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 										methodToCall->name);
 								int pi = 0;
 								for(; pi < vsrc1; pi++){
-									TLOGW("SESAME %d", outs[(pi << 1) + 1]);
+									TLOGW("SESAME %x", outs[(pi << 1) + 1]);
 								}
 							}
             	/* clear native hack (vsrc1 is the count)*/
@@ -4445,15 +4445,15 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 										methodToCall->name);
 								switch(count){
 									case 5:
-										TLOGW("SESAME %d", outs[count+5]);
+										TLOGW("SESAME %x", outs[count+5]);
 									case 4:
-										TLOGW("SESAME %d", outs[count+4]);
+										TLOGW("SESAME %x", outs[count+4]);
 									case 3:
-										TLOGW("SESAME %d", outs[count+3]);
+										TLOGW("SESAME %x", outs[count+3]);
 									case 2:
-										TLOGW("SESAME %d", outs[count+2]);
+										TLOGW("SESAME %x", outs[count+2]);
 									case 1:
-										TLOGW("SESAME %d", outs[count+1]);
+										TLOGW("SESAME %x", outs[count+1]);
 									default:
 										;
 								}		
@@ -4491,15 +4491,15 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 										methodToCall->name);
 								switch(count){
 									case 5:
-										TLOGW("SESAME %d", outs[9]);
+										TLOGW("SESAME %x", outs[9]);
 									case 4:
-										TLOGW("SESAME %d", outs[7]);
+										TLOGW("SESAME %x", outs[7]);
 									case 3:
-										TLOGW("SESAME %d", outs[5]);
+										TLOGW("SESAME %x", outs[5]);
 									case 2:
-										TLOGW("SESAME %d", outs[3]);
+										TLOGW("SESAME %x", outs[3]);
 									case 1:
-										TLOGW("SESAME %d", outs[1]);
+										TLOGW("SESAME %x", outs[1]);
 									default:
 										;
 								}
