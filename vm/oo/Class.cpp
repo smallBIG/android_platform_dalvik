@@ -408,6 +408,8 @@ static bool createInitialClasses() {
  */
 bool dvmClassStartup()
 {
+		//add by chenxiong
+		ALOGE("SESAME Class#dvmClassStartup %s ", gDvm.bootClassPathStr);
     /* make this a requirement -- don't currently support dirs in path */
     if (strcmp(gDvm.bootClassPathStr, ".") == 0) {
         ALOGE("ERROR: must specify non-'.' bootclasspath");

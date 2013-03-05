@@ -35,6 +35,11 @@
 #include <stdarg.h>
 #include <pthread.h>
 
+//#ifdef WITH_PRINT_METHOD
+#ifdef WITH_TAINT_TRACKING
+#include <stdio.h>
+#endif
+
 /* private structures */
 struct GcHeap;
 struct BreakpointSet;
@@ -74,6 +79,11 @@ enum ProfilerClockSource {
     kProfilerClockSourceWall,
     kProfilerClockSourceDual,
 };
+
+//#ifdef WITH_PRINT_METHOD
+#ifdef WITH_TAINT_TRACKING
+#define METHODS_TO_PRINT_FILE "/system/etc/methods_to_print"
+#endif
 
 /*
  * All fields are initialized to zero.
@@ -727,8 +737,10 @@ struct DvmGlobals {
     /* String pointed here will be deposited on the stack frame of dvmAbort */
     const char *lastMessage;
 
+//#ifdef WITH_PRINT_METHOD
 #ifdef WITH_TAINT_TRACKING
-		bool methodsToTaint;
+		bool printMethod;
+		FILE *methodsFile;
 #endif
 
 };

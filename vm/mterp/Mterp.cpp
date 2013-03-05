@@ -76,6 +76,28 @@ void dvmMterpStd(Thread* self)
     /* configure mterp items */
     self->interpSave.methodClassDex = self->interpSave.method->clazz->pDvmDex;
 
+#ifdef WITH_PRINT_METHOD
+//#ifdef WITH_TAINT_TRACKING
+				if(!gDvm.printMethod){
+				  	ALOGE("SESAME PRINT_METHOD file is not open, try again!");
+						if((gDvm.methodsFile = fopen(METHODS_TO_PRINT_FILE, "r")) != NULL){
+						    ALOGE("SESAME PRINT_METHOD open file succeed!");
+								gDvm.printMethod = true;
+								//parse the file
+								char *content;
+								int len;
+								fseek(gDvm.methodsFile, 0, SEEK_END);
+								len = ftell(gDvm.methodsFile);
+								content = (char*)malloc(len+1);
+								fread(content, 1, len, gDvm.methodsFile);
+								ALOGE("SESAME PRINT_METHOD file content: %s", content);
+								free(content);
+						}else{
+								ALOGE("SESAME PRINT_METHOD open file failed! %d", errno);
+						}
+				}
+#endif
+
     IF_LOGVV() {
         char* desc = dexProtoCopyMethodDescriptor(
                          &self->interpSave.method->prototype);

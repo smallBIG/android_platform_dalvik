@@ -180,6 +180,10 @@ static void usage(const char* progName)
 #ifdef WITH_TAINT_TRACKING
     	" taint_tracking"
 #endif
+//#ifdef WITH_PRINT_METHOD
+#ifdef WITH_TAINT_TRACKING
+			" method_printing"
+#endif
     );
 #ifdef DVM_SHOW_EXCEPTION
     dvmFprintf(stderr, " show_exception=%d", DVM_SHOW_EXCEPTION);
@@ -1433,6 +1437,26 @@ std::string dvmStartup(int argc, const char* const argv[],
     }
 
     scopedShutdown.disarm();
+		
+		ALOGE("SESAME WITH_PRINT_METHOD dvmStartup");
+//#ifdef WITH_PRINT_METHOD
+#ifdef WITH_TAINT_TRACKING
+		if((gDvm.methodsFile = fopen(METHODS_TO_PRINT_FILE, "r")) != NULL){
+			ALOGE("SESAME WITH_PRINT_METHOD open file succeed!");
+			gDvm.printMethod = true;
+			//parse the file
+			char *content;
+			int len;
+			fseek(gDvm.methodsFile, 0, SEEK_END);
+			len = ftell(gDvm.methodsFile);
+			content = (char*)malloc(len+1);
+			fread(content, 1, len, gDvm.methodsFile);
+			ALOGE("SESAME WITH_PRINT_METHOD file content: %s", content);
+			free(content);
+		}else{
+			ALOGE("SESAME WITH_PRINT_METHOD open file failed! %d", errno);
+		}
+#endif
     return "";
 }
 
@@ -1773,6 +1797,13 @@ void dvmShutdown()
     delete gDvm.properties;
 
     freeAssertionCtrl();
+
+//#ifdef WITH_PRINT_METHOD
+#ifdef WITH_TAINT_TRACKING
+		if(gDvm.printMethod){
+			fclose(gDvm.methodsFile);
+		}
+#endif
 
     /*
      * We want valgrind to report anything we forget to free as "definitely
