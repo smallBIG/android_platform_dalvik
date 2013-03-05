@@ -154,6 +154,21 @@ static const char kSpacing[] = "            ";
             ALOG(_level, LOG_TAG"t", "%-2d|####%s\n",                       \
                 self->threadId, debugStrBuf);                               \
     } while(false)
+
+#define IS_LJAVA clazzDescriptor[0]=='L' && clazzDescriptor[1]=='j' && \
+													 clazzDescriptor[2]=='a' && clazzDescriptor[3]=='v' && \
+													 clazzDescriptor[4]=='a'
+
+#define IS_LANDROID clazzDescriptor[0]=='L' && clazzDescriptor[1]=='a' && \
+													 clazzDescriptor[2]=='n' && clazzDescriptor[3]=='d' && \
+													 clazzDescriptor[4]=='r' && clazzDescriptor[5]=='o' && \
+													 clazzDescriptor[6]=='i' && clazzDescriptor[7]=='d'
+
+#define IS_LDALVIK  clazzDescriptor[0]=='L' && clazzDescriptor[1]=='d' && \
+													 clazzDescriptor[2]=='a' && clazzDescriptor[3]=='l' && \
+													 clazzDescriptor[4]=='v' && clazzDescriptor[5]=='i' && \
+                           clazzDescriptor[6]=='k'
+
 #else
 # define TLOGD(...) ((void)0)
 # define TLOGV(...) ((void)0)

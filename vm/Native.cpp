@@ -111,6 +111,9 @@ void dvmResolveNativeMethod(const u4* args, JValue* pResult,
     void* func = lookupSharedLibMethod(method);
     if (func != NULL) {
         /* found it, point it at the JNI bridge and then call it */
+				//begin WITH_TAINT_TRACKING
+				ALOGE("Taint SESAME call JNI %s->%s %s", method->clazz->descriptor, method->name, method->shorty);
+				//end   WITH_TAINT_TRACKING
         dvmUseJNIBridge((Method*) method, func);
         (*method->nativeFunc)(args, pResult, method, self);
         return;
@@ -331,15 +334,15 @@ bool dvmLoadNativeCode(const char* pathName, Object* classLoader,
 
 #ifdef WITH_TAINT_TRACKING
     // PJG: TODO: factor out this check
-		/* commented by chenxiong
+		// commented by chenxiong
     if (strncmp(pathName, "/system", sizeof("/system")-1) != 0 && strcmp(pathName, "libjavacore.so") !=0 && strcmp(pathName, "libnativehelper.so") !=0) {
-    	ALOGW("Denying lib %s (not \"/system\" prefix)\n", pathName);
-    	return false;
+    	ALOGW("SESAME Loading lib %s (not \"/system\" prefix)\n", pathName);
+    	//return false;
     }
     if (strstr(pathName, "/../") != NULL) {
-    	ALOGW("Denying lib %s (contains \"/../\")\n", pathName);
-    	return false;
-    }*/
+    	ALOGW("SESAME Loading lib %s (contains \"/../\")\n", pathName);
+    	//return false;
+    }
 #endif
 
     *detail = NULL;

@@ -726,6 +726,11 @@ struct DvmGlobals {
 
     /* String pointed here will be deposited on the stack frame of dvmAbort */
     const char *lastMessage;
+
+#ifdef WITH_TAINT_TRACKING
+		bool methodsToTaint;
+#endif
+
 };
 
 extern struct DvmGlobals gDvm;

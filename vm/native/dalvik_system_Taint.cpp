@@ -548,14 +548,17 @@ static u4 getTaintXattr(int fd)
     } else {
 	if (errno == ENOATTR) {
 	    /* do nothing */
+	    ALOGW("TaintLog: SESAME fgetxattr(%d) ENOATTR", fd);
 	} else if (errno == ERANGE) {
-	    ALOGW("TaintLog: fgetxattr(%d) contents to large", fd);
+	    ALOGW("TaintLog: SESAME fgetxattr(%d) contents to large", fd);
 	} else if (errno == ENOTSUP) {
+	    ALOGW("TaintLog: SESAME fgetxattr(%d) xattrs not support", fd);
 	    /* XATTRs are not supported. No need to spam the logs */
 	} else if (errno == EPERM) {
+	    ALOGW("TaintLog: SESAME fgetxattr(%d) strance interaction", fd);
 	    /* Strange interaction with /dev/log/main. Suppress the log */
 	} else {
-	    ALOGW("TaintLog: fgetxattr(%d): unknown error code %d", fd, errno);
+	    ALOGW("TaintLog: SESAME fgetxattr(%d): unknown error code %d", fd, errno);
 	}
     }
 
@@ -570,13 +573,15 @@ static void setTaintXattr(int fd, u4 tag)
 
     if (ret < 0) {
 	if (errno == ENOSPC || errno == EDQUOT) {
-	    ALOGW("TaintLog: fsetxattr(%d): not enough room to set xattr", fd);
+	    ALOGW("TaintLog: SESAME fsetxattr(%d): not enough room to set xattr", fd);
 	} else if (errno == ENOTSUP) {
+	    ALOGW("TaintLog: SESAME fsetxattr(%d): xattr not support", fd);
 	    /* XATTRs are not supported. No need to spam the logs */
 	} else if (errno == EPERM) {
+	    ALOGW("TaintLog: SESAME fsetxattr(%d): strange interaction", fd);
 	    /* Strange interaction with /dev/log/main. Suppress the log */
 	} else {
-	    ALOGW("TaintLog: fsetxattr(%d): unknown error code %d", fd, errno);
+	    ALOGW("TaintLog: SESAME fsetxattr(%d): unknown error code %d", fd, errno);
 	}
     }
 
@@ -593,11 +598,14 @@ static void Dalvik_dalvik_system_Taint_getTaintFile(const u4* args,
     // args[1] = the return taint
     // args[2] = fd taint
 
+		ALOGI("TaintLog: SESAME getTaintFile(%d) = 0x%08x", fd, tag);
     tag = getTaintXattr(fd);
 
     if (tag) {
-	ALOGI("TaintLog: getTaintFile(%d) = 0x%08x", fd, tag);
-    }
+			ALOGI("TaintLog: SESAME getTaintFile(%d) = 0x%08x", fd, tag);
+    }else{
+			ALOGI("TaintLog: SESAME getTaintFile(%d) = 0x%08x", fd, tag);
+		}
 
     RETURN_INT(tag);
 }
@@ -618,9 +626,12 @@ static void Dalvik_dalvik_system_Taint_addTaintFile(const u4* args,
     otag = getTaintXattr(fd);
 
     if (tag) {
-	ALOGI("TaintLog: addTaintFile(%d): adding 0x%08x to 0x%08x = 0x%08x",
-		fd, tag, otag, tag | otag);
-    }
+			ALOGI("TaintLog: SESAME addTaintFile(%d): adding 0x%08x to 0x%08x = 0x%08x",
+				fd, tag, otag, tag | otag);
+    }else{
+			ALOGI("TaintLog: SESAME addTaintFile(%d): adding 0x%08x to 0x%08x = 0x%08x",
+			fd, tag, otag, tag | otag);
+		}
 
     setTaintXattr(fd, tag | otag);
 
@@ -671,9 +682,9 @@ static void Dalvik_dalvik_system_Taint_logPathFromFd(const u4* args,
     snprintf(ppath, 20, "/proc/%d/fd/%d", pid, fd);
     err = readlink(ppath, rpath, 80);
     if (err >= 0) {
-	ALOGW("TaintLog: fd %d -> %s", fd, rpath);
+	ALOGW("TaintLog: SESAME fd %d -> %s", fd, rpath);
     } else {
-	ALOGW("TaintLog: error finding path for fd %d", fd);
+	ALOGW("TaintLog: SESAME error finding path for fd %d", fd);
     }
 
     RETURN_VOID();
@@ -687,7 +698,7 @@ static void Dalvik_dalvik_system_Taint_logPeerFromFd(const u4* args,
 {
     int fd = (int) args[0];
 
-    ALOGW("TaintLog: logPeerFromFd not yet implemented");
+    ALOGW("TaintLog: SESAME logPeerFromFd not yet implemented");
 
     RETURN_VOID();
 }

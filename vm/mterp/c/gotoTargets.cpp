@@ -772,6 +772,10 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
         int i;
 #ifdef WITH_TAINT_TRACKING
         bool nativeTarget = dvmIsNativeMethod(methodToCall);
+				const char *clazzDescriptor = methodToCall->clazz->descriptor;
+				bool isJava = IS_LJAVA;
+				bool isAndroid = IS_LANDROID;	
+				bool isDalvik = IS_LDALVIK;
 #endif
 
         /*
@@ -791,40 +795,40 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
             	/* clear return taint (vsrc1 is the count) */
             	outs[vsrc1] = TAINT_CLEAR;
             	/* copy the taint tags (vsrc1 is the count) */
-							//bool taintNativeCall = false;
+							bool taintNativeCall = false;
             	for (i = 0; i < vsrc1; i++) {
             		outs[vsrc1+1+i] = GET_REGISTER_TAINT(vdst+i);
-								//if(!taintNativeCall){
-									//taintNativeCall = (outs[vsrc1+1+i] != 0) ? true : false;
-								//}
+								if(!isJava && !isAndroid &&  !isDalvik && !taintNativeCall){
+									taintNativeCall = (outs[vsrc1+1+i] != 0) ? true : false;
+								}
             	}
-							/*if(taintNativeCall){
+							if(taintNativeCall && !isJava && !isAndroid && !isDalvik){
 								TLOGW("SESAME call native method %s->%s:", methodToCall->clazz->descriptor,
 										methodToCall->name);
 								int pi = 0;
 								for(; pi < vsrc1; pi++){
 									TLOGW("SESAME %x", outs[vsrc1+1+pi]);
 								}
-							}*/
+							}
             } else {
             	int slot = 0;
-							//bool taintCall = false;
+							bool taintCall = false;
             	for (i = 0; i < vsrc1; i++) {
             		slot = i << 1;
             		outs[slot] = GET_REGISTER(vdst+i);
             		outs[slot+1] = GET_REGISTER_TAINT(vdst+i);
-								//if(!taintCall){
-									//taintCall = (outs[slot+1] != 0) ? true : false;
-								//}
+								if(!isJava && !isAndroid && !isDalvik && !taintCall){
+									taintCall = (outs[slot+1] != 0) ? true : false;
+								}
             	}
-							/*if(taintCall){
+							if(taintCall && !isJava && !isAndroid && !isDalvik){
 								TLOGW("SESAME call method %s->%s:", methodToCall->clazz->descriptor,
 										methodToCall->name);
 								int pi = 0;
 								for(; pi < vsrc1; pi++){
 									TLOGW("SESAME %x", outs[(pi << 1) + 1]);
 								}
-							}*/
+							}
             	/* clear native hack (vsrc1 is the count)*/
             	outs[vsrc1<<1] = TAINT_CLEAR;
             }
@@ -855,32 +859,32 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
             assert((vdst >> 16) == 0);  // 16 bits -or- high 16 bits clear
 #ifdef WITH_TAINT_TRACKING
             if (nativeTarget) {
-							//bool taintNativeCall = false;
+							bool taintNativeCall = false;
             	switch (count) {
             	case 5:
             		outs[4] = GET_REGISTER(vsrc1 & 0x0f);
             		outs[count+5] = GET_REGISTER_TAINT(vsrc1 & 0x0f);
-								//taintNativeCall = (outs[count+5] != 0) ? true : false;
+								taintNativeCall = (outs[count+5] != 0) ? true : false;
             	case 4:
             		outs[3] = GET_REGISTER(vdst >> 12);
             		outs[count+4] = GET_REGISTER_TAINT(vdst >> 12);
-								//taintNativeCall = (outs[count+4] != 0) ? true : false;
+								taintNativeCall = (outs[count+4] != 0) ? true : false;
             	case 3:
             		outs[2] = GET_REGISTER((vdst & 0x0f00) >> 8);
             		outs[count+3] = GET_REGISTER_TAINT((vdst & 0x0f00) >> 8);
-								//taintNativeCall = (outs[count+3] != 0) ? true : false;
+								taintNativeCall = (outs[count+3] != 0) ? true : false;
             	case 2:
             		outs[1] = GET_REGISTER((vdst & 0x00f0) >> 4);
             		outs[count+2] = GET_REGISTER_TAINT((vdst & 0x00f0) >> 4);
-								//taintNativeCall = (outs[count+2] != 0) ? true : false;
+								taintNativeCall = (outs[count+2] != 0) ? true : false;
             	case 1:
             		outs[0] = GET_REGISTER(vdst & 0x0f);
             		outs[count+1] = GET_REGISTER_TAINT(vdst & 0x0f);
-								//taintNativeCall = (outs[count+1] != 0) ? true : false;
+								taintNativeCall = (outs[count+1] != 0) ? true : false;
             	default:
             		;
             	}
-							/*if(taintNativeCall){
+							if(taintNativeCall && !isJava && !isAndroid && !isDalvik){
 								TLOGW("SESAME call native method %s->%s:", methodToCall->clazz->descriptor,
 										methodToCall->name);
 								switch(count){
@@ -897,36 +901,36 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 									default:
 										;
 								}		
-							}*/
+							}
             	/* clear the native hack */
             	outs[count] = TAINT_CLEAR;
             } else { /* interpreted target */
-							//bool taintCall = false;
+							bool taintCall = false;
             	switch (count) {
             	case 5:
             		outs[8] = GET_REGISTER(vsrc1 & 0x0f);
             		outs[9] = GET_REGISTER_TAINT(vsrc1 & 0x0f);
-								//taintCall = (outs[9] != 0) ? true : false;
+								taintCall = (outs[9] != 0) ? true : false;
             	case 4:
             		outs[6] = GET_REGISTER(vdst >> 12);
             		outs[7] = GET_REGISTER_TAINT(vdst >> 12);
-								//taintCall = (outs[7] != 0) ? true : false;
+								taintCall = (outs[7] != 0) ? true : false;
             	case 3:
             		outs[4] = GET_REGISTER((vdst & 0x0f00) >> 8);
             		outs[5] = GET_REGISTER_TAINT((vdst & 0x0f00) >> 8);
-								//taintCall = (outs[5] != 0) ? true : false;
+								taintCall = (outs[5] != 0) ? true : false;
             	case 2:
             		outs[2] = GET_REGISTER((vdst & 0x00f0) >> 4);
             		outs[3] = GET_REGISTER_TAINT((vdst & 0x00f0) >> 4);
-								//taintCall = (outs[3] != 0) ? true : false;
+								taintCall = (outs[3] != 0) ? true : false;
             	case 1:
             		outs[0] = GET_REGISTER(vdst & 0x0f);
             		outs[1] = GET_REGISTER_TAINT(vdst & 0x0f);
-								//taintCall = (outs[1] != 0) ? true : false;
+								taintCall = (outs[1] != 0) ? true : false;
            	default:
             		;
               	}
-							/*if(taintCall){
+							if(taintCall && !isJava && !isAndroid && !isDalvik){
 								TLOGW("SESAME call method %s->%s:", methodToCall->clazz->descriptor, 
 										methodToCall->name);
 								switch(count){
@@ -943,7 +947,7 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
 									default:
 										;
 								}
-							}*/
+							}
             	/* clear the native hack */
             	outs[count<<1] = TAINT_CLEAR;
             }
@@ -1102,11 +1106,12 @@ GOTO_TARGET(invokeMethod, bool methodCallRange, const Method* _methodToCall,
             	/* use same logic as above to calculate count */
             	u4 count = (methodCallRange) ? vsrc1 : vsrc1 >> 4;
             	u4* outs = OUTS_FROM_FP(fp, count);
+							const char *clazzDescriptor = methodToCall->clazz->descriptor;
             	SET_RETURN_TAINT(outs[count]);
-							/*if(outs[count] != 0){
-								TLOGW("SESAME ret frm native %s->%s with %d", 
-										methodToCall->clazz->descriptor, methodToCall->name, outs[count]);
-							}*/
+							//if(/*outs[count] != 0*/ !(IS_LJAVA) && !(IS_LANDROID)){
+							//	TLOGW("SESAME ret frm native %s->%s with %d", 
+							//			methodToCall->clazz->descriptor, methodToCall->name, outs[count]);
+							//}
             }
 #endif
 
