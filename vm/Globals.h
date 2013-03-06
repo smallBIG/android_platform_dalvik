@@ -83,6 +83,11 @@ enum ProfilerClockSource {
 //#ifdef WITH_PRINT_METHOD
 #ifdef WITH_TAINT_TRACKING
 #define METHODS_TO_PRINT_FILE "/system/etc/methods_to_print"
+struct SesameMethod {
+	char* className;
+	char* methodName;
+	char* methodShorty;
+};
 #endif
 
 /*
@@ -740,7 +745,8 @@ struct DvmGlobals {
 //#ifdef WITH_PRINT_METHOD
 #ifdef WITH_TAINT_TRACKING
 		bool printMethod;
-		FILE *methodsFile;
+		int sesameMethodSize;
+		SesameMethod* sesameMethods;
 #endif
 
 };

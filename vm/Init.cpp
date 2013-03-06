@@ -1441,18 +1441,55 @@ std::string dvmStartup(int argc, const char* const argv[],
 		ALOGE("SESAME WITH_PRINT_METHOD dvmStartup");
 //#ifdef WITH_PRINT_METHOD
 #ifdef WITH_TAINT_TRACKING
-		if((gDvm.methodsFile = fopen(METHODS_TO_PRINT_FILE, "r")) != NULL){
+		FILE* methodsFile;
+		if((methodsFile = fopen(METHODS_TO_PRINT_FILE, "r")) != NULL){
 			ALOGE("SESAME WITH_PRINT_METHOD open file succeed!");
 			gDvm.printMethod = true;
 			//parse the file
-			char *content;
-			int len;
-			fseek(gDvm.methodsFile, 0, SEEK_END);
-			len = ftell(gDvm.methodsFile);
-			content = (char*)malloc(len+1);
-			fread(content, 1, len, gDvm.methodsFile);
-			ALOGE("SESAME WITH_PRINT_METHOD file content: %s", content);
-			free(content);
+			char className[128];
+			char methodName[64];
+			char methodShorty[32];
+			if(1 != fscanf(methodsFile, "%d\n", &gDvm.sesameMethodSize)){
+				ALOGE("SESAME WITH_PRINT_METHOD can not read the num of method");
+			}else{
+				ALOGE("SESAME WITH_PRINT_METHOD method num %d", gDvm.sesameMethodSize);
+				//alloc the mem for SesameMethod
+				gDvm.sesameMethods = (SesameMethod*)calloc(gDvm.sesameMethodSize, sizeof(SesameMethod));
+				ALOGE("SESAME WITH_PRINT_METHOD mem allocated");
+			}
+			gDvm.sesameMethodSize = 0;
+			while(3 == fscanf(methodsFile, "%s %s %s\n", className, methodName, methodShorty)){
+				ALOGE("SESAME WITH_PRINT_METHOD %s %s %s", className, methodName, methodShorty);
+				//copy the className
+				size_t nameLen = strlen(className);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].className = (char*)malloc(nameLen + 1);
+				memcpy(gDvm.sesameMethods[gDvm.sesameMethodSize].className, className, nameLen);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].className[nameLen] = '\0';
+				//copy the methodName
+				nameLen = strlen(methodName);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].methodName = (char*)malloc(nameLen + 1);
+				memcpy(gDvm.sesameMethods[gDvm.sesameMethodSize].methodName, methodName, nameLen);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].methodName[nameLen] = '\0';
+				//copy the methodShorty
+				nameLen = strlen(methodShorty);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].methodShorty = (char*)malloc(nameLen + 1);
+				memcpy(gDvm.sesameMethods[gDvm.sesameMethodSize].methodShorty, methodShorty, nameLen);
+				gDvm.sesameMethods[gDvm.sesameMethodSize].methodShorty[nameLen] = '\0';
+
+				gDvm.sesameMethodSize++;
+			}
+			//debug
+			int sesameIdx = 0;
+			int sesameMethodSize = gDvm.sesameMethodSize;
+			ALOGE("SESAME WITH_PRINT_METHOD method size %d", gDvm.sesameMethodSize);
+			for(; sesameIdx < sesameMethodSize; sesameIdx++){
+				ALOGE("SESAME WITH_PRINT_METHOD %s %s %s", 
+						gDvm.sesameMethods[sesameIdx].className, 
+						gDvm.sesameMethods[sesameIdx].methodName, 
+						gDvm.sesameMethods[sesameIdx].methodShorty);
+			}
+
+			fclose(methodsFile);
 		}else{
 			ALOGE("SESAME WITH_PRINT_METHOD open file failed! %d", errno);
 		}
@@ -1801,7 +1838,14 @@ void dvmShutdown()
 //#ifdef WITH_PRINT_METHOD
 #ifdef WITH_TAINT_TRACKING
 		if(gDvm.printMethod){
-			fclose(gDvm.methodsFile);
+			int sesameMethodIdx = 0;
+			for(; sesameMethodIdx < gDvm.sesameMethodSize; sesameMethodIdx++){
+				free(gDvm.sesameMethods[sesameMethodIdx].className);
+				free(gDvm.sesameMethods[sesameMethodIdx].methodName);
+				free(gDvm.sesameMethods[sesameMethodIdx].methodShorty);
+			}
+			free(gDvm.sesameMethods);
+			gDvm.printMethod = false;
 		}
 #endif
 
